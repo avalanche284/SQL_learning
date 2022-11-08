@@ -388,19 +388,30 @@ What interesting ways are there to filter the data (using AND/OR)?
 */
 --queries
 
--- average time of spacewalk
-SELECT AVG(Space_Walks_hr) FROM astronauts;
-SELECT Name FROM astronauts GROUP BY  HAVING AVG(Space_Walks_hr);
+-- average time of spacewalk -DONE
+SELECT AVG(Space_Walks_hr) AS avg_swhrs FROM astronauts;
+-- Which of the astronauts is the oldest? - DONE
+SELECT Name, MIN(YEAR) FROM astronauts;
+-- Which of the astronauts has been flight the most freequently? -DONE
+SELECT Name, MAX(Space_Flights) FROM astronauts;
 
+-- Which astronauts have their time of spacewalks more than avg? _DONE
+SELECT Name, Space_Walks_hr FROM astronauts GROUP BY Space_Walks_hr HAVING (Space_Walks_hr > (SELECT AVG(Space_Walks_hr) AS avg_swhrs FROM astronauts));
 
 -- How many astronauts are active and how many are retired?
-SELECT COUNT(*) AS number_astr FROM astronauts;
 SELECT COUNT(*) AS active_astr FROM astronauts WHERE Status = "Active";
 SELECT COUNT(*) AS ret_astr FROM astronauts WHERE Status = "Retired";
 
---Which astronaut spend the most hours in the space?
-
-
-
-
 --Which generation does have most astnauts and how many?
+SELECT Name, Space_Walks_hr,
+CASE
+  WHEN Space_Walks_hr > 24 THEN 'More than a day of walking in the space!'
+  WHEN Space_Walks_hr > 12 THEN 'More than 12 hours of walking in the space'
+  WHEN Space_Walks_hr > 8 THEN 'More than a regular job working hours of walking in the space!'
+  WHEN Space_Walks_hr > 0 THEN 'Walking in the space at least once for some time.'
+  ELSE 'No space walks at all.'
+END AS 'Walking in the space'
+FROM astronauts;
+
+-- Which astronauts where the first ones who were walking on the moon and have not died?
+SELECT * FROM astronauts WHERE Missions LIKE '%Apollo 11%' AND Death_Date IS NULL;
